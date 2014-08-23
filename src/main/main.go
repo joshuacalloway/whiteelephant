@@ -22,27 +22,43 @@ func pickfromHat(participants []string) (string, []string) {
 	return chosen,append(participants[0:random], participants[random+1:len(participants)]...)
 }
 
-func removeParticipant(lookingfor string, participants []string) ([]string) {
+// return tuple.  participants without lookingfor.
+// and return true if lookingfor was removed.  else false if not found
+func removeParticipant(lookingfor string, participants []string) (bool, []string) {
 	ret := []string{}
-
+    found := false
 	for _, person := range participants {
 		if string(person) != lookingfor {
 		  ret = append(ret, person)
+		  found = true
 		}
 	}
-	return ret
+	return found, ret
+}
+
+func exists(item string, list []string) bool {
+	for _, b := range list {
+		if b == item {
+			return true
+		}
+	}
+	return false
 }
 
 func generateAssignments(participants ...string) ([]assignments) {
   ret := []assignments{}
   var hat []string = participants
+  chosenlist := []string{}
 
   for _, person := range participants {
-	hat = removeParticipant(string(person), hat)
+	_, hat = removeParticipant(string(person), hat)
 	var chosen string
 	chosen, hat = pickfromHat(hat)
+	chosenlist = append(chosenlist, chosen)
     ret = append(ret, assignments{person, chosen})
-	hat = append(hat, person)
+	if !exists(string(person), chosenlist) {
+	  hat = append(hat, person)
+	}
   }
   return ret
 }
